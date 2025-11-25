@@ -6,7 +6,6 @@ package main
 import "C"
 import (
 	"runtime/cgo"
-	"unsafe"
 
 	oidfed "github.com/go-oidfed/lib"
 )
@@ -14,8 +13,8 @@ import (
 //export oidfedEmptyCollectionFilter
 func oidfedEmptyCollectionFilter() C.struct_oidfed_collection_filter {
 	ret := &[]oidfed.EntityCollectionFilter{}
-	reth := cgo.NewHandle(ret)
-	return C.struct_oidfed_collection_filter{C.uintptr_t(reth)}
+	val := packageGoThing(ret)
+	return C.struct_oidfed_collection_filter{val}
 }
 
 //export oidfedCollectionFilterAppend
@@ -25,14 +24,13 @@ func oidfedCollectionFilterAppend(
 ) {
 	h := cgo.Handle(cfs.impl)
 	defer h.Delete()
-
 	realFilters := h.Value().(*[]oidfed.EntityCollectionFilter)
-	// resolve incoming filter handle
+
 	fh := cgo.Handle(filter)
 	filterVal := fh.Value().(oidfed.EntityCollectionFilter)
+
 	newFilters := append(*realFilters, filterVal)
-	reth := cgo.NewHandle(&newFilters)
-	cfs.impl = C.uintptr_t(reth)
+	cfs.impl = packageGoThing(&newFilters)
 }
 
 //export oidfedEntityCollectionFilterOPSupportsExplicitRegistration
@@ -40,15 +38,9 @@ func oidfedEntityCollectionFilterOPSupportsExplicitRegistration(
 	taIds **C.char,
 	taIdsCount C.size_t,
 ) C.uintptr_t {
-	taidsSlice := unsafe.Slice(taIds, uintptr(taIdsCount))
-	var idSlice []string
-	for _, cstr := range taidsSlice {
-		taId := C.GoString(cstr)
-		idSlice = append(idSlice, taId)
-	}
+	idSlice := goifyCArray(taIds, taIdsCount)
 	filter := oidfed.EntityCollectionFilterOPSupportsExplicitRegistration(idSlice)
-	h := cgo.NewHandle(filter)
-	return C.uintptr_t(h)
+	return packageGoThing(filter)
 }
 
 //export oidfedEntityCollectionFilterOPSupportsAutomaticRegistration
@@ -56,15 +48,9 @@ func oidfedEntityCollectionFilterOPSupportsAutomaticRegistration(
 	taIds **C.char,
 	taIdsCount C.size_t,
 ) C.uintptr_t {
-	taidsSlice := unsafe.Slice(taIds, uintptr(taIdsCount))
-	var idSlice []string
-	for _, cstr := range taidsSlice {
-		taId := C.GoString(cstr)
-		idSlice = append(idSlice, taId)
-	}
+	idSlice := goifyCArray(taIds, taIdsCount)
 	filter := oidfed.EntityCollectionFilterOPSupportsAutomaticRegistration(idSlice)
-	h := cgo.NewHandle(filter)
-	return C.uintptr_t(h)
+	return packageGoThing(filter)
 }
 
 //export oidfedEntityCollectionFilterOPSupportedGrantTypesIncludes
@@ -74,23 +60,11 @@ func oidfedEntityCollectionFilterOPSupportedGrantTypesIncludes(
 	grantTypes **C.char,
 	grantTypesCount C.size_t,
 ) C.uintptr_t {
-	taidsSlice := unsafe.Slice(taIds, uintptr(taIdsCount))
-	var idSlice []string
-	for _, cstr := range taidsSlice {
-		taId := C.GoString(cstr)
-		idSlice = append(idSlice, taId)
-	}
-
-	grantsSlice := unsafe.Slice(grantTypes, uintptr(grantTypesCount))
-	var neededGrantTypes []string
-	for _, cstr := range grantsSlice {
-		gt := C.GoString(cstr)
-		neededGrantTypes = append(neededGrantTypes, gt)
-	}
+	idSlice := goifyCArray(taIds, taIdsCount)
+	neededGrantTypes := goifyCArray(grantTypes, grantTypesCount)
 
 	filter := oidfed.EntityCollectionFilterOPSupportedGrantTypesIncludes(idSlice, neededGrantTypes...)
-	h := cgo.NewHandle(filter)
-	return C.uintptr_t(h)
+	return packageGoThing(filter)
 }
 
 //export oidfedEntityCollectionFilterOPSupportedScopesIncludes
@@ -100,28 +74,15 @@ func oidfedEntityCollectionFilterOPSupportedScopesIncludes(
 	scopes **C.char,
 	scopesCount C.size_t,
 ) C.uintptr_t {
-	taidsSlice := unsafe.Slice(taIds, uintptr(taIdsCount))
-	var idSlice []string
-	for _, cstr := range taidsSlice {
-		taId := C.GoString(cstr)
-		idSlice = append(idSlice, taId)
-	}
-
-	scopesSlice := unsafe.Slice(scopes, uintptr(scopesCount))
-	var neededScopes []string
-	for _, cstr := range scopesSlice {
-		sc := C.GoString(cstr)
-		neededScopes = append(neededScopes, sc)
-	}
+	idSlice := goifyCArray(taIds, taIdsCount)
+	neededScopes := goifyCArray(scopes, scopesCount)
 
 	filter := oidfed.EntityCollectionFilterOPSupportedScopesIncludes(idSlice, neededScopes...)
-	h := cgo.NewHandle(filter)
-	return C.uintptr_t(h)
+	return packageGoThing(filter)
 }
 
 //export oidfedEntityCollectionFilterOPs
 func oidfedEntityCollectionFilterOPs() C.uintptr_t {
 	filter := oidfed.EntityCollectionFilterOPs()
-	h := cgo.NewHandle(filter)
-	return C.uintptr_t(h)
+	return packageGoThing(filter)
 }
