@@ -7,6 +7,9 @@ main() {
     struct oidfed_trust_anchor ta = oidfedTrustAnchorCreate("https://ta.oidf-pilot.edugain.org");
     struct oidfed_collector collector = oidfedCollectorCreateSmart(&ta, 1);
     struct oidfed_collection_filter filter = oidfedEmptyCollectionFilter();
+    oidfedCollectionFilterAppend(&filter, oidfedEntityCollectionFilterOPs());
+    char* op_uri = "https://ta.oidf-pilot.edugain.org";
+    oidfedCollectionFilterAppend(&filter, oidfedEntityCollectionFilterOPSupportsAutomaticRegistration(&op_uri, 1));
 
     struct oidfed_collected_entity* entities = 0;
     size_t entities_len = 0;
