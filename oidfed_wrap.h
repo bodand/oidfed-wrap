@@ -5,6 +5,10 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+struct oidfed_map {
+    uintptr_t impl;
+};
+
 struct oidfed_trust_mark {
 	void* impl;
 };
@@ -33,6 +37,38 @@ struct oidfed_collected_entity_ui_enumerator {
 
 struct oidfed_ui_info {
     const char* display_name;
+    uintptr_t impl;
+};
+
+struct oidfed_signer {
+    uintptr_t impl;
+};
+
+struct oidfed_signature_algorithm {
+    const char* name;
+    bool deprecated;
+    bool symmetric;
+    uintptr_t impl;
+};
+
+struct oidfed_versatile_signer {
+    uintptr_t impl;
+};
+
+struct oidfed_single_key_storage {
+    uintptr_t impl;
+};
+
+inline struct oidfed_versatile_signer
+oidfedSingleKeyStorageAsVersatileSigner(struct oidfed_single_key_storage* storage) {
+    return (struct oidfed_versatile_signer){ .impl = storage->impl };
+}
+
+struct oidfed_request_producer {
+    uintptr_t impl;
+};
+
+struct oidfed_request_object {
     uintptr_t impl;
 };
 

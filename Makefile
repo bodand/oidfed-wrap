@@ -1,8 +1,9 @@
 GO_SRC := $(wildcard *.go)
 
-demo: demo.c main.a main.h
-	cc -g demo.c -Wall -Wextra -o $@ -L. -l:main.a
+demo: demo.c oidfed_wrap_lib.h liboidfed_wrap.a
+	cc -g demo.c -Wall -Wextra -o $@ -L. -loidfed_wrap
 
-main.a main.h: ${GO_SRC} oidfed_wrap.h
+oidfed_wrap_lib.h liboidfed_wrap.a: ${GO_SRC} oidfed_wrap.h
 	go build -buildmode=c-archive -v ${GO_SRC}
+	mv oidfed_wrap_lib.a liboidfed_wrap.a
 

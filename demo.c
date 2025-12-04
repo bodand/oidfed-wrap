@@ -1,9 +1,14 @@
 #include <stdio.h>
+#include <assert.h>
 
-#include "main.h"
+#include "oidfed_wrap_lib.h"
 
 int
 main() {
+    bool success = false;
+    struct oidfed_signature_algorithm es384 = oidfedSignatureAlgorithmGet("ES384", &success);
+    assert(success);
+
     struct oidfed_trust_anchor ta = oidfedTrustAnchorCreate("https://ta.oidf-pilot.edugain.org");
     struct oidfed_collector collector = oidfedCollectorCreateSmart(&ta, 1);
     struct oidfed_collection_filter filter = oidfedEmptyCollectionFilter();
@@ -28,8 +33,10 @@ main() {
         oidfedCollectedEntityDestroy(&entities[i]);
     }
 
+    oidfedCollectionFilterDestroy(&filter);
     oidfedCollectorDestroy(&collector);
     oidfedTrustAnchorDestroy(&ta);
     free(entities);
+    oidfedSignatureAlgorithmDestroy(&es384);
 	return 0;
 }

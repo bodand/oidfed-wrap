@@ -17,6 +17,11 @@ func oidfedEmptyCollectionFilter() C.struct_oidfed_collection_filter {
 	return C.struct_oidfed_collection_filter{val}
 }
 
+//export oidfedCollectionFilterDestroy
+func oidfedCollectionFilterDestroy(cfs *C.struct_oidfed_collection_filter) {
+	cgo.Handle(cfs.impl).Delete()
+}
+
 //export oidfedCollectionFilterAppend
 func oidfedCollectionFilterAppend(
 	cfs *C.struct_oidfed_collection_filter,
