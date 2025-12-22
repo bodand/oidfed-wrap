@@ -20,12 +20,7 @@ func goifyCArray(cStrings **C.char, cStringCount C.size_t) []string {
 }
 
 func goifyCByteArray(bytes *C.char, bytesCount C.size_t) []byte {
-	bytesSlice := unsafe.Slice(bytes, uintptr(bytesCount))
-	goStrings := make([]byte, 0, bytesCount)
-	for _, byt := range bytesSlice {
-		goStrings = append(goStrings, byt.(byte))
-	}
-	return goStrings
+	return C.GoBytes(unsafe.Pointer(bytes), C.int(bytesCount))
 }
 
 func packageGoThing(v any) C.uintptr_t {

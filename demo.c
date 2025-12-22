@@ -16,6 +16,29 @@ main() {
     char* op_uri = "https://ta.oidf-pilot.edugain.org";
     oidfedCollectionFilterAppend(&filter, oidfedEntityCollectionFilterOPSupportsAutomaticRegistration(&op_uri, 1));
 
+    int errc = 0;
+    struct oidfed_entity_statement stmt = oidfedGetEntityConfiguration(op_uri, &errc);
+    if (errc == 0) {
+        printf("Got entity configuration for %s\n", op_uri);
+        oidfedEntityStatementDestroy(&stmt);
+    }
+
+    struct oidfed_trust_resolver resolver = oidfedTrustResolverCreate(op_uri, &ta, 1);
+    struct oidfed_trust_chains chains = oidfedTrustResolverResolveToValidChains(resolver);
+    size_t chains_count = oidfedTrustChainsCount(chains);
+    printf("Found %zu trust chains\n", chains_count);
+    for (size_t i = 0; i < chains_count; i++) {
+        struct oidfed_trust_chain chain = oidfedTrustChainsGet(chains, i);
+        struct oidfed_metadata metadata = oidfedTrustChainGetMetadata(chain, &errc);
+        if (errc == 0) {
+            printf("  - Chain %zu metadata resolved\n", i);
+            oidfedMetadataDestroy(&metadata);
+        }
+        oidfedTrustChainDestroy(&chain);
+    }
+    oidfedTrustChainsDestroy(&chains);
+    oidfedTrustResolverDestroy(&resolver);
+
     struct oidfed_collected_entity* entities = 0;
     size_t entities_len = 0;
     oidfedCollectorCollectVerifiedEntitiesWithFilter(ta, &collector, filter, &entities, &entities_len);

@@ -72,4 +72,32 @@ struct oidfed_request_object {
     uintptr_t impl;
 };
 
+struct oidfed_signed_bytes {
+    uintptr_t impl;
+};
+
+struct oidfed_entity_statement {
+    uintptr_t impl;
+};
+
+struct oidfed_trust_resolver {
+    uintptr_t impl;
+};
+
+struct oidfed_trust_chain {
+    uintptr_t impl;
+};
+
+struct oidfed_trust_chains {
+    uintptr_t impl;
+};
+
+struct oidfed_metadata {
+    uintptr_t impl;
+};
+
+struct oidfed_federation_leaf {
+    uintptr_t impl;
+};
+
 #endif

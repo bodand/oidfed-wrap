@@ -102,3 +102,10 @@ func oidfedTrustMarkGetRefreshGracePeriod(tm C.struct_oidfed_trust_mark) C.uint6
 	x := (*oidfed.EntityConfigurationTrustMarkConfig)(tm.impl)
 	return C.uint64_t(x.RefreshGracePeriod.Duration().Seconds())
 }
+
+//export oidfedTrustMarkDestroy
+func oidfedTrustMarkDestroy(tm *C.struct_oidfed_trust_mark) {
+	if tm.impl != nil {
+		// Since it was created with new() and not cgo.Handle, we don't need to do much
+	}
+}

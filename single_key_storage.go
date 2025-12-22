@@ -17,7 +17,7 @@ func oidfedSingleKeyStorageCreate(
 	signer C.struct_oidfed_signer,
 	alg C.struct_oidfed_signature_algorithm,
 ) C.struct_oidfed_single_key_storage {
-	signerImpl := cgo.Handle(signer).Value().(crypto.Signer)
+	signerImpl := cgo.Handle(signer.impl).Value().(crypto.Signer)
 	signAlg := cgo.Handle(alg.impl).Value().(jwa.SignatureAlgorithm)
 	sks := jwx.NewSingleKeyVersatileSigner(signerImpl, signAlg)
 	return C.struct_oidfed_single_key_storage{

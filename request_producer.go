@@ -50,3 +50,36 @@ func oidfedRequestProducerProduceObject(
 	}
 	return C.struct_oidfed_signed_bytes{packageGoThing(bytes)}
 }
+
+//export oidfedRequestProducerClientAssertion
+func oidfedRequestProducerClientAssertion(
+	producer C.struct_oidfed_request_producer,
+	audience *C.char,
+	algorithms **C.char,
+	algorithmsCount C.size_t,
+	errc *C.int,
+) C.struct_oidfed_signed_bytes {
+	rop := cgo.Handle(producer.impl).Value().(*oidfed.RequestObjectProducer)
+	goAudience := C.GoString(audience)
+	algs := goifyCArray(algorithms, algorithmsCount)
+	bytes, err := rop.ClientAssertion(goAudience, algs...)
+	if err != nil {
+		*errc = 1
+		return C.struct_oidfed_signed_bytes{}
+	}
+	return C.struct_oidfed_signed_bytes{packageGoThing(bytes)}
+}
+
+//export oidfedSignedBytesDestroy
+func oidfedSignedBytesDestroy(sb *C.struct_oidfed_signed_bytes) {
+	if sb.impl != 0 {
+		cgo.Handle(sb.impl).Delete()
+	}
+}
+
+//export oidfedSignedBytesGetData
+func oidfedSignedBytesGetData(sb C.struct_oidfed_signed_bytes, count *C.size_t) *C.char {
+	bytes := cgo.Handle(sb.impl).Value().([]byte)
+	*count = C.size_t(len(bytes))
+	return (*C.char)(C.CBytes(bytes))
+}

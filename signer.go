@@ -2,9 +2,6 @@ package main
 
 /*
 #include "oidfed_wrap.h"
-
-const static int OidfedErrInvalidPEM = 1;
-const static int OidfedErrInvalidPrivateKey = 2;
 */
 import "C"
 import (
@@ -19,16 +16,16 @@ func oidfedSignerCreateFromPEM(
 	pemCount C.size_t,
 	errc *C.int,
 ) C.struct_oidfed_signer {
-	pemSlice := goifyCByteArray(&pemBytes, pemCount)
+	pemSlice := goifyCByteArray(pemBytes, pemCount)
 	pemData, _ := pem.Decode(pemSlice)
 	if pemData == nil {
-		*errc = C.OidfedErrInvalidPEM
+		*errc = 1 // OidfedErrInvalidPEM
 		return C.struct_oidfed_signer{0}
 	}
 
 	key, err := x509.ParsePKCS8PrivateKey(pemData.Bytes)
 	if err != nil {
-		*errc = C.OidfedErrInvalidPrivateKey
+		*errc = 2 // OidfedErrInvalidPrivateKey
 		return C.struct_oidfed_signer{0}
 	}
 
