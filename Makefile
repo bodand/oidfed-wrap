@@ -36,5 +36,5 @@ clean:
 
 .PHONY: install
 install: build
-	install -D -m644 -t ${INCLUDE_INSTALL} ${LIB_HEADER} 
+	install -D -m644 -t ${INCLUDE_INSTALL} ${LIB_HEADER} oidfed_wrap.h
 	install -D -m644 -t ${LIBRARY_INSTALL} ${LIB_ARCHIVE}
