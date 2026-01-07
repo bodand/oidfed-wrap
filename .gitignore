@@ -1,4 +1,5 @@
 # Build artefacts
-liboidfed_wrap.a
 oidfed_wrap_lib.h
 demo
+*.o
+*.a
