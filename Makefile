@@ -7,6 +7,10 @@ GOFLAGS := -buildmode=c-archive -v
 # of this makefile
 GO_SRC := $(wildcard *.go)
 
+PREFIX ?= /usr/local
+INCLUDE_INSTALL ?= ${PREFIX}/include
+LIBRARY_INSTALL ?= ${PREFIX}/lib
+
 LIB_HEADER := oidfed_wrap_lib.h 
 LIB_ARCHIVE := liboidfed_wrap.a
 
@@ -29,3 +33,8 @@ oidfed_wrap_lib.h oidfed_wrap_lib.a: ${GO_SRC} oidfed_wrap.h
 clean:
 	-rm -f ${LIB_ARCHIVE} ${LIB_HEADER} oidfed_wrap_lib.a
 	-rm -f demo
+
+.PHONY: install
+install: build
+	install -D -m644 -t ${INCLUDE_INSTALL} ${LIB_HEADER} 
+	install -D -m644 -t ${LIBRARY_INSTALL} ${LIB_ARCHIVE}
