@@ -69,14 +69,19 @@ func oidfedFederationLeafDestroy(leaf *C.struct_oidfed_federation_leaf) {
 }
 
 //export oidfedFederationLeafGetAsJWT
-func oidfedFederationLeafGetAsJWT(leaf C.struct_oidfed_federation_leaf, errc *C.int) *C.char {
+func oidfedFederationLeafGetAsJWT(leaf C.struct_oidfed_federation_leaf,
+	bytes **C.char,
+	bytesCount *C.size_t) C.int {
 	goLeaf := cgo.Handle(leaf.impl).Value().(*oidfed.FederationLeaf)
+
 	jwt, err := goLeaf.EntityConfigurationJWT()
 	if err != nil {
-		*errc = 1
-		return nil
+		return 1
 	}
-	return (*C.char)(C.CBytes(jwt))
+
+	*bytes = (*C.char)(C.CBytes(jwt))
+	*bytesCount = C.size_t(len(jwt))
+	return 0
 }
 
 //export oidfedFederationLeafGetRequestObjectProducer
