@@ -40,7 +40,7 @@ func oidfedFederationLeafCreate(
 	federationVs := cgo.Handle(federationSigner.impl).Value().(jwx.VersatileSigner)
 	oidcVs := cgo.Handle(oidcSigner.impl).Value().(jwx.VersatileSigner)
 
-	metadataImpl := cgo.Handle(metadata.impl).Value().(oidfed.Metadata)
+	metadataImpl := cgo.Handle(metadata.impl).Value().(*oidfed.Metadata)
 
 	ess := jwx.NewEntityStatementSigner(federationVs)
 
@@ -48,7 +48,7 @@ func oidfedFederationLeafCreate(
 		goEntityID,
 		goHints,
 		anchors,
-		&metadataImpl,
+		metadataImpl,
 		ess,
 		time.Hour*24,
 		oidcVs,
@@ -66,6 +66,17 @@ func oidfedFederationLeafDestroy(leaf *C.struct_oidfed_federation_leaf) {
 	if leaf.impl != 0 {
 		cgo.Handle(leaf.impl).Delete()
 	}
+}
+
+//export oidfedFederationLeafGetAsJWT
+func oidfedFederationLeafGetAsJWT(leaf *C.struct_oidfed_federation_leaf, errc *C.int) *C.char {
+	goLeaf := cgo.Handle(leaf.impl).Value().(*oidfed.FederationLeaf)
+	jwt, err := goLeaf.EntityConfigurationJWT()
+	if err != nil {
+		*errc = 1
+		return nil
+	}
+	return (*C.char)(C.CBytes(jwt))
 }
 
 //export oidfedFederationLeafGetRequestObjectProducer
