@@ -98,6 +98,18 @@ func oidfedOpenIDRelyingPartyMetadataSetJWKS(rp C.struct_oidfed_openid_relying_p
 	metadata.JWKS = cgo.Handle(jwks).Value().(*jwx.JWKS)
 }
 
+//export oidfedOpenIDRelyingPartyMetadataSetJWKSFromKeyStorage
+func oidfedOpenIDRelyingPartyMetadataSetJWKSFromKeyStorage(
+	rp C.struct_oidfed_openid_relying_party_metadata,
+	storage C.struct_oidfed_single_key_storage,
+) {
+	goStorage := cgo.Handle(storage.impl).Value().(jwx.SingleKeyStorage)
+	metadata := cgo.Handle(rp.impl).Value().(*oidfed.OpenIDRelyingPartyMetadata)
+
+	jwks := goStorage.JWKS()
+	metadata.JWKS = &jwks
+}
+
 //export oidfedOpenIDRelyingPartyMetadataGetOrganizationName
 func oidfedOpenIDRelyingPartyMetadataGetOrganizationName(rp C.struct_oidfed_openid_relying_party_metadata) *C.char {
 	metadata := cgo.Handle(rp.impl).Value().(*oidfed.OpenIDRelyingPartyMetadata)
