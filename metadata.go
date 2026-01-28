@@ -45,3 +45,18 @@ func oidfedMetadataSetRPMetadata(m C.struct_oidfed_metadata, rp C.uintptr_t) {
 	metadata := cgo.Handle(m.impl).Value().(*oidfed.Metadata)
 	metadata.RelyingParty = cgo.Handle(rp).Value().(*oidfed.OpenIDRelyingPartyMetadata)
 }
+
+//export oidfedMetadataGetFederationEntityMetadata
+func oidfedMetadataGetFederationEntityMetadata(m C.struct_oidfed_metadata) C.uintptr_t {
+	metadata := cgo.Handle(m.impl).Value().(*oidfed.Metadata)
+	if metadata.FederationEntity == nil {
+		return 0
+	}
+	return packageGoThing(metadata.FederationEntity)
+}
+
+//export oidfedMetadataSetFederationEntityMetadata
+func oidfedMetadataSetFederationEntityMetadata(m C.struct_oidfed_metadata, fe C.uintptr_t) {
+	metadata := cgo.Handle(m.impl).Value().(*oidfed.Metadata)
+	metadata.FederationEntity = cgo.Handle(fe).Value().(*oidfed.FederationEntityMetadata)
+}
