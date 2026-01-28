@@ -7,30 +7,44 @@ import "C"
 import (
 	"runtime/cgo"
 	"time"
+	"unsafe"
 
 	oidfed "github.com/go-oidfed/lib"
 	"github.com/go-oidfed/lib/jwx"
 )
 
-//export oidfedFederationLeafCreateSimple
-func oidfedFederationLeafCreateSimple(
+//export oidfedFederationLeafCreate
+func oidfedFederationLeafCreate(
 	entityID *C.char,
-	signer C.struct_oidfed_versatile_signer,
+	authorityHints **C.char,
+	authorityHintsCount C.size_t,
+	trustAnchors *C.struct_oidfed_trust_anchor,
+	trustAnchorsCount C.size_t,
+	federationSigner C.struct_oidfed_versatile_signer,
+	oidcSigner C.struct_oidfed_versatile_signer,
+	metadata C.struct_oidfed_metadata,
 	errc *C.int,
 ) C.struct_oidfed_federation_leaf {
 	goEntityID := C.GoString(entityID)
-	vs := cgo.Handle(signer.impl).Value().(jwx.VersatileSigner)
 
-	ess := jwx.NewEntityStatementSigner(vs)
+	goHints := goifyCArray(authorityHints, authorityHintsCount)
+	goAnchors := unsafe.Slice(trustAnchors, uintptr(trustAnchorsCount))
+
+	federationVs := cgo.Handle(federationSigner.impl).Value().(jwx.VersatileSigner)
+	oidcVs := cgo.Handle(oidcSigner.impl).Value().(jwx.VersatileSigner)
+
+	metadataImpl := cgo.Handle(metadata.impl).Value().(oidfed.Metadata)
+
+	ess := jwx.NewEntityStatementSigner(federationVs)
 
 	leaf, err := oidfed.NewFederationLeaf(
 		goEntityID,
-		nil,
-		nil,
-		nil,
+		goHints,
+		goAnchors,
+		&metadataImpl,
 		ess,
 		time.Hour*24,
-		vs,
+		oidcVs,
 		nil,
 	)
 	if err != nil {

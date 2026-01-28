@@ -96,6 +96,10 @@ struct oidfed_metadata {
     uintptr_t impl;
 };
 
+struct oidfed_openid_relying_party_metadata {
+    uintptr_t impl;
+};
+
 struct oidfed_federation_leaf {
     uintptr_t impl;
 };
