@@ -29,6 +29,13 @@ func oidfedFederationLeafCreate(
 
 	goHints := goifyCArray(authorityHints, authorityHintsCount)
 	goAnchors := unsafe.Slice(trustAnchors, uintptr(trustAnchorsCount))
+	anchors := make(oidfed.TrustAnchors, trustAnchorsCount)
+	for i, a := range goAnchors {
+		anchors[i] = oidfed.TrustAnchor{
+			EntityID: C.GoString(a.entity_id),
+			JWKS:     *(*jwx.JWKS)(a.jwks),
+		}
+	}
 
 	federationVs := cgo.Handle(federationSigner.impl).Value().(jwx.VersatileSigner)
 	oidcVs := cgo.Handle(oidcSigner.impl).Value().(jwx.VersatileSigner)
@@ -40,7 +47,7 @@ func oidfedFederationLeafCreate(
 	leaf, err := oidfed.NewFederationLeaf(
 		goEntityID,
 		goHints,
-		goAnchors,
+		anchors,
 		&metadataImpl,
 		ess,
 		time.Hour*24,
