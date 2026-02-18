@@ -88,7 +88,11 @@ func oidfedFederationLeafGetAsJWT(leaf C.struct_oidfed_federation_leaf,
 func oidfedFederationLeafGetRequestObjectProducer(
 	leaf C.struct_oidfed_federation_leaf,
 ) C.struct_oidfed_request_producer {
-	l := cgo.Handle(leaf.impl).Value().(*oidfed.FederationLeaf)
+	val := cgo.Handle(leaf.impl).Value()
+	l, ok := val.(*oidfed.FederationLeaf)
+	if !ok {
+		return C.struct_oidfed_request_producer{0}
+	}
 	rp := l.RequestObjectProducer()
 	return C.struct_oidfed_request_producer{packageGoThing(rp)}
 }

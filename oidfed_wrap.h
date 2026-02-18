@@ -72,6 +72,10 @@ struct oidfed_request_object {
     uintptr_t impl;
 };
 
+struct oidfed_jws_headers {
+    uintptr_t impl;
+};
+
 struct oidfed_signed_bytes {
     uintptr_t impl;
 };

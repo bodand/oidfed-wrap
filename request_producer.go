@@ -10,6 +10,7 @@ import (
 
 	oidfed "github.com/go-oidfed/lib"
 	"github.com/go-oidfed/lib/jwx"
+	"github.com/lestrrat-go/jwx/v3/jws"
 )
 
 //export oidfedRequestProducerCreate
@@ -35,6 +36,7 @@ func oidfedRequestProducerDestroy(producer *C.struct_oidfed_request_producer) {
 func oidfedRequestProducerProduceObject(
 	producer C.struct_oidfed_request_producer,
 	requestValues C.struct_oidfed_map,
+	headers C.struct_oidfed_jws_headers,
 	algorithms **C.char,
 	algorithmsCount C.size_t,
 	errc *C.int,
@@ -42,8 +44,13 @@ func oidfedRequestProducerProduceObject(
 	rop := cgo.Handle(producer.impl).Value().(*oidfed.RequestObjectProducer)
 	rv := cgo.Handle(requestValues.impl).Value().(map[string]any)
 
+	var h jws.Headers
+	if headers.impl != 0 {
+		h = cgo.Handle(headers.impl).Value().(jws.Headers)
+	}
+
 	algs := goifyCArray(algorithms, algorithmsCount)
-	bytes, err := rop.RequestObject(rv, algs...)
+	bytes, err := rop.RequestObject(rv, h, algs...)
 	if err != nil {
 		*errc = 1
 		return C.struct_oidfed_signed_bytes{}
