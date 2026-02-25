@@ -6,6 +6,7 @@ package main
 import "C"
 import (
 	"runtime/cgo"
+	"log"
 	"time"
 
 	oidfed "github.com/go-oidfed/lib"
@@ -52,6 +53,7 @@ func oidfedRequestProducerProduceObject(
 	algs := goifyCArray(algorithms, algorithmsCount)
 	bytes, err := rop.RequestObject(rv, h, algs...)
 	if err != nil {
+	    log.Printf("aaaa: %s", err)
 		*errc = 1
 		return C.struct_oidfed_signed_bytes{}
 	}

@@ -17,18 +17,18 @@ func oidfedMetadataCreate() C.struct_oidfed_metadata {
 }
 
 //export oidfedMetadataGetOPMetadata
-func oidfedMetadataGetOPMetadata(m C.struct_oidfed_metadata) C.uintptr_t {
+func oidfedMetadataGetOPMetadata(m C.struct_oidfed_metadata) C.struct_oidfed_openid_provider_metadata {
 	metadata := cgo.Handle(m.impl).Value().(*oidfed.Metadata)
 	if metadata.OpenIDProvider == nil {
-		return 0
+		return C.struct_oidfed_openid_provider_metadata{0}
 	}
-	return packageGoThing(metadata.OpenIDProvider)
+	return C.struct_oidfed_openid_provider_metadata{packageGoThing(metadata.OpenIDProvider)}
 }
 
 //export oidfedMetadataSetOPMetadata
-func oidfedMetadataSetOPMetadata(m C.struct_oidfed_metadata, op C.uintptr_t) {
+func oidfedMetadataSetOPMetadata(m C.struct_oidfed_metadata, op C.struct_oidfed_openid_provider_metadata) {
 	metadata := cgo.Handle(m.impl).Value().(*oidfed.Metadata)
-	metadata.OpenIDProvider = cgo.Handle(op).Value().(*oidfed.OpenIDProviderMetadata)
+	metadata.OpenIDProvider = cgo.Handle(op.impl).Value().(*oidfed.OpenIDProviderMetadata)
 }
 
 //export oidfedMetadataGetRPMetadata

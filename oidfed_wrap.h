@@ -9,6 +9,8 @@ struct oidfed_map {
     uintptr_t impl;
 };
 
+void oidfMapDestroy(struct oidfed_map* m);
+
 struct oidfed_trust_mark {
 	void* impl;
 };
@@ -101,6 +103,10 @@ struct oidfed_metadata {
 };
 
 struct oidfed_openid_relying_party_metadata {
+    uintptr_t impl;
+};
+
+struct oidfed_openid_provider_metadata {
     uintptr_t impl;
 };
 

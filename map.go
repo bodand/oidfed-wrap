@@ -30,3 +30,10 @@ func oidfMapSetInt64(m C.struct_oidfed_map, key *C.char, value C.int64_t) {
 	impl := cgo.Handle(m.impl).Value().(map[string]any)
 	impl[C.GoString(key)] = int64(value)
 }
+
+//export oidfMapDestroy
+func oidfMapDestroy(m *C.struct_oidfed_map) {
+	if m.impl != 0 {
+		cgo.Handle(m.impl).Delete()
+	}
+}
