@@ -5,10 +5,13 @@ package main
 */
 import "C"
 import (
-	"runtime/cgo"
-	"log"
-	"time"
 	"encoding/json"
+	"io"
+	"log"
+	"net/http"
+	"net/url"
+	"runtime/cgo"
+	"time"
 
 	oidfed "github.com/go-oidfed/lib"
 	"github.com/go-oidfed/lib/jwx"
@@ -55,7 +58,7 @@ func oidfedRequestProducerProduceObject(
 	algs := goifyCArray(algorithms, algorithmsCount)
 	bytes, err := rop.RequestObject(rv, h, algs...)
 	if err != nil {
-	    log.Printf("aaaa: %s", err)
+		log.Printf("aaaa: %s", err)
 		*errc = 1
 		return C.struct_oidfed_signed_bytes{}
 	}
@@ -89,8 +92,42 @@ func oidfedRequestProducerExchangeCode(
 	redirectURI *C.char,
 	errc *C.int,
 ) *C.char {
-	log.Printf("oidfedRequestProducerExchangeCode called (stub)")
-	return C.CString("{\"error\": \"not_implemented\", \"error_description\": \"Token exchange not yet implemented in wrapper\"}")
+	rop := cgo.Handle(producer.impl).Value().(*oidfed.RequestObjectProducer)
+	goTokenEndpoint := C.GoString(tokenEndpoint)
+	goCode := C.GoString(code)
+	goRedirectURI := C.GoString(redirectURI)
+
+	clientAssertion, err := rop.ClientAssertion(goTokenEndpoint)
+	if err != nil {
+		log.Printf("failed to produce client assertion: %v", err)
+		*errc = 1
+		return nil
+	}
+
+	params := url.Values{}
+	params.Set("grant_type", "authorization_code")
+	params.Set("code", goCode)
+	params.Set("redirect_uri", goRedirectURI)
+	params.Set("client_id", rop.EntityID)
+	params.Set("client_assertion_type", "urn:ietf:params:oauth:client-assertion-type:jwt-bearer")
+	params.Set("client_assertion", string(clientAssertion))
+
+	res, err := http.PostForm(goTokenEndpoint, params)
+	if err != nil {
+		log.Printf("failed to post form to token endpoint: %v", err)
+		*errc = 1
+		return nil
+	}
+	defer res.Body.Close()
+
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		log.Printf("failed to read response body: %v", err)
+		*errc = 1
+		return nil
+	}
+
+	return C.CString(string(body))
 }
 
 //export oidfedExtractSubjectFromTokenResponse
