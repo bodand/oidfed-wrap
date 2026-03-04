@@ -16,6 +16,12 @@ func oidfedOpenIDProviderMetadataGetAuthorizationEndpoint(m C.struct_oidfed_open
 	return C.CString(metadata.AuthorizationEndpoint)
 }
 
+//export oidfedOpenIDProviderMetadataGetTokenEndpoint
+func oidfedOpenIDProviderMetadataGetTokenEndpoint(m C.struct_oidfed_openid_provider_metadata) *C.char {
+	metadata := cgo.Handle(m.impl).Value().(*oidfed.OpenIDProviderMetadata)
+	return C.CString(metadata.TokenEndpoint)
+}
+
 //export oidfedOpenIDProviderMetadataGetIssuer
 func oidfedOpenIDProviderMetadataGetIssuer(m C.struct_oidfed_openid_provider_metadata) *C.char {
 	metadata := cgo.Handle(m.impl).Value().(*oidfed.OpenIDProviderMetadata)

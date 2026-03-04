@@ -8,10 +8,12 @@ import (
 	"runtime/cgo"
 	"log"
 	"time"
+	"encoding/json"
 
 	oidfed "github.com/go-oidfed/lib"
 	"github.com/go-oidfed/lib/jwx"
 	"github.com/lestrrat-go/jwx/v3/jws"
+	"github.com/lestrrat-go/jwx/v3/jwt"
 )
 
 //export oidfedRequestProducerCreate
@@ -77,6 +79,50 @@ func oidfedRequestProducerClientAssertion(
 		return C.struct_oidfed_signed_bytes{}
 	}
 	return C.struct_oidfed_signed_bytes{packageGoThing(bytes)}
+}
+
+//export oidfedRequestProducerExchangeCode
+func oidfedRequestProducerExchangeCode(
+	producer C.struct_oidfed_request_producer,
+	tokenEndpoint *C.char,
+	code *C.char,
+	redirectURI *C.char,
+	errc *C.int,
+) *C.char {
+	log.Printf("oidfedRequestProducerExchangeCode called (stub)")
+	return C.CString("{\"error\": \"not_implemented\", \"error_description\": \"Token exchange not yet implemented in wrapper\"}")
+}
+
+//export oidfedExtractSubjectFromTokenResponse
+func oidfedExtractSubjectFromTokenResponse(tokenResponse *C.char) *C.char {
+	goTokenResponse := C.GoString(tokenResponse)
+	var data map[string]interface{}
+	if err := json.Unmarshal([]byte(goTokenResponse), &data); err != nil {
+		log.Printf("Failed to unmarshal token response: %v", err)
+		return nil
+	}
+
+	idToken, ok := data["id_token"].(string)
+	if !ok {
+		if sub, ok := data["sub"].(string); ok {
+			return C.CString(sub)
+		}
+		return nil
+	}
+
+	t, err := jwt.ParseString(idToken, jwt.WithVerify(false))
+	if err != nil {
+		log.Printf("Failed to parse ID token: %v", err)
+		return nil
+	}
+
+	sub, ok := t.Subject()
+	if !ok {
+		log.Printf("ID token does not contain a subject")
+		return nil
+	}
+
+	return C.CString(sub)
 }
 
 //export oidfedSignedBytesDestroy

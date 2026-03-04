@@ -70,6 +70,9 @@ struct oidfed_request_producer {
     uintptr_t impl;
 };
 
+char* oidfedRequestProducerExchangeCode(struct oidfed_request_producer producer, char* tokenEndpoint, char* code, char* redirectURI, int* errc);
+char* oidfedExtractSubjectFromTokenResponse(char* tokenResponse);
+
 struct oidfed_request_object {
     uintptr_t impl;
 };
@@ -109,6 +112,8 @@ struct oidfed_openid_relying_party_metadata {
 struct oidfed_openid_provider_metadata {
     uintptr_t impl;
 };
+
+char* oidfedOpenIDProviderMetadataGetTokenEndpoint(struct oidfed_openid_provider_metadata m);
 
 struct oidfed_federation_entity_metadata {
     uintptr_t impl;
