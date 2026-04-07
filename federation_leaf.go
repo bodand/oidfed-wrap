@@ -58,6 +58,11 @@ func oidfedFederationLeafCreate(
 		*errc = 1
 		return C.struct_oidfed_federation_leaf{0}
 	}
+	leaf.MetadataUpdater = func(metadata *oidfed.Metadata) {
+		jwks := oidcVs.JWKS()
+		metadata.RelyingParty.JWKS = &jwks
+	}
+
 	return C.struct_oidfed_federation_leaf{packageGoThing(leaf)}
 }
 
