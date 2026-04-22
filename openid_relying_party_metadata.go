@@ -103,11 +103,13 @@ func oidfedOpenIDRelyingPartyMetadataSetJWKSFromKeyStorage(
 	rp C.struct_oidfed_openid_relying_party_metadata,
 	storage C.struct_oidfed_single_key_storage,
 ) {
-	goStorage := cgo.Handle(storage.impl).Value().(jwx.SingleKeyStorage)
+	goStorage := cgo.Handle(storage.impl).Value().(jwx.SingleKeySigner)
 	metadata := cgo.Handle(rp.impl).Value().(*oidfed.OpenIDRelyingPartyMetadata)
 
-	jwks := goStorage.JWKS()
-	metadata.JWKS = &jwks
+	jwks, err := goStorage.JWKS()
+	if err == nil {
+		metadata.JWKS = &jwks
+	}
 }
 
 //export oidfedOpenIDRelyingPartyMetadataGetOrganizationName
