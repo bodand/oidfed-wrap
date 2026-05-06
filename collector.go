@@ -69,10 +69,10 @@ func oidfedCollectorCollectVerifiedEntitiesWithFilter(ta C.struct_oidfed_trust_a
 		return C.int(err.Status)
 	}
 
-	rawMemory := C.malloc(C.size_t(unsafe.Sizeof(**entities)) * C.size_t(len(collectionResp.FederationEntities)))
+	rawMemory := C.malloc(C.size_t(unsafe.Sizeof(**entities)) * C.size_t(len(collectionResp.Entities)))
 	*entities = (*C.struct_oidfed_collected_entity)(rawMemory)
-	*entitiesCount = C.size_t(len(collectionResp.FederationEntities))
-	for i, fe := range collectionResp.FederationEntities {
+	*entitiesCount = C.size_t(len(collectionResp.Entities))
+	for i, fe := range collectionResp.Entities {
 		next := (*C.struct_oidfed_collected_entity)(unsafe.Pointer(uintptr(unsafe.Pointer(*entities)) + uintptr(i)*unsafe.Sizeof(**entities)))
 		next.entity_id = C.CString(fe.EntityID)
 		h := cgo.NewHandle(fe)
