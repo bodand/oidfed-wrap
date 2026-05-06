@@ -17,6 +17,18 @@ func oidfedOpenIDRelyingPartyMetadataCreate() C.struct_oidfed_openid_relying_par
 	return C.struct_oidfed_openid_relying_party_metadata{packageGoThing(rp)}
 }
 
+//export oidfedOpenIdRelyingPartyMetadataGetInitateLoginUri
+func oidfedOpenIdRelyingPartyMetadataGetInitiateLoginUri(rp C.struct_oidfed_openid_relying_party_metadata) *C.char {
+	metadata := cgo.Handle(rp.impl).Value().(*oidfed.OpenIDRelyingPartyMetadata)
+	return C.CString(metadata.InitiateLoginURI)
+}
+
+//export oidfedOpenIDRelyingPartyMetadataSetInitateLoginUri
+func oidfedOpenIDRelyingPartyMetadataSetInitiateLoginUri(rp C.struct_oidfed_openid_relying_party_metadata, uri *C.char) {
+	metadata := cgo.Handle(rp.impl).Value().(*oidfed.OpenIDRelyingPartyMetadata)
+	metadata.InitiateLoginURI = C.GoString(uri)
+}
+
 //export oidfedOpenIDRelyingPartyMetadataGetClientID
 func oidfedOpenIDRelyingPartyMetadataGetClientID(rp C.struct_oidfed_openid_relying_party_metadata) *C.char {
 	metadata := cgo.Handle(rp.impl).Value().(*oidfed.OpenIDRelyingPartyMetadata)
