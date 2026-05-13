@@ -42,6 +42,13 @@ func oidfedFederationLeafCreate(
 
 	metadataImpl := cgo.Handle(metadata.impl).Value().(*oidfed.Metadata)
 
+	oidcJwks, err := oidcVs.JWKS()
+	if err != nil {
+		*errc = 2
+		return C.struct_oidfed_federation_leaf{0}
+	}
+	metadataImpl.RelyingParty.JWKS = &oidcJwks
+
 	ess := jwx.NewEntityStatementSigner(federationVs)
 
 	leaf, err := oidfed.NewFederationLeaf(
@@ -57,12 +64,6 @@ func oidfedFederationLeafCreate(
 	if err != nil {
 		*errc = 1
 		return C.struct_oidfed_federation_leaf{0}
-	}
-	if sf, ok := leaf.FederationEntity.(*oidfed.StaticFederationEntity); ok {
-		jwks, err := oidcVs.JWKS()
-		if err == nil {
-			sf.Metadata.RelyingParty.JWKS = &jwks
-		}
 	}
 
 	return C.struct_oidfed_federation_leaf{packageGoThing(leaf)}
